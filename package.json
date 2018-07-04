@@ -69,5 +69,9 @@
     "webpack": "^4.12.1",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-dev-server": "^3.1.4"
+  },
+  "scripts": {
+    "start": "gulp",
+    "start:prod": "gulp --production"
   }
 }
