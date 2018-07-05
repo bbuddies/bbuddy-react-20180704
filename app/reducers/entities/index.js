@@ -1,5 +1,8 @@
 import merge from 'lodash/merge'
-const initialState = { accounts: {} }
+const initialState = {
+  accounts: {},
+  budgets: {}
+}
 
 export default function entities(state = initialState, action) {
   if (action.data && action.data.entities) {

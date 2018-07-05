@@ -36,6 +36,11 @@ function mapStateToProps(state) {
         text: 'Accounts',
         url: '/accounts',
         icon: <AccountIcon/>,
+      },
+      {
+        text: 'Budgets',
+        url: '/budgets',
+        icon: <AccountIcon/>,
       }
     ]
   }
