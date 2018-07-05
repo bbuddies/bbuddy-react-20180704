@@ -10,6 +10,7 @@ describe('Budget', () => {
   beforeEach(() => {
     budget = new Budget()
   })
+
   describe('query', () => {
     describe('given there is no budget', () => {
       describe('when query from 2018-07-01 to 2018-07-31', () => {
@@ -41,6 +42,14 @@ describe('Budget', () => {
           expect(result).to.eq(3100)
         })
       })
+
+      describe('when query from 2018-01-01 to 2018-01-31', () => {
+        it('should return 0', () => {
+          const result = budget.query('2018-01-01', '2018-01-31')
+
+          expect(result).to.eq(0)
+        })
+      })
     })
 
     describe(`given there is budget for 2018-06: 3000, 2018-07: 3100, 2018-08: 3100`, () => {
@@ -55,6 +64,23 @@ describe('Budget', () => {
       describe('when query from 2018-06-15 to 2018-08-15', () => {
         it('should return 6200', () => {
           const result = budget.query('2018-06-15', '2018-08-15')
+
+          expect(result).to.eq(6200)
+        })
+      })
+    })
+
+    describe('given there is budget for 2017-12: 3100, 2019-01: 3100', () => {
+      beforeEach(() => {
+        budget.budgets = {
+          '2017-12': 3100,
+          '2019-01': 3100
+        }
+      })
+
+      describe('when query from 2016-01-01 to 2020-12-31', () => {
+        it('should return 6200', () => {
+          const result = budget.query('2016-01-01', '2020-12-31')
 
           expect(result).to.eq(6200)
         })
