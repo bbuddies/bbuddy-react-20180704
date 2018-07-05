@@ -66,21 +66,30 @@ export class Budgets {
   };
 
   query = (startDate, endDate) => {
-    const period = new Period(startDate, endDate)
+    const period = new Period(startDate, endDate);
     const month = startDate.format("YYYY-MM");
-    const selectedBudget = this.findBudgetPeriodByMonth(month);
-    const selectedBudget2 = this.findBudgetPeriodByMonth(endDate.format("YYYY-MM"));
-
-    if(!selectedBudget) {
-      return 0
-    } else if (selectedBudget == selectedBudget2) {
-      return this.getAmountInPeriod(period, selectedBudget);
+    const firstBudgetPeriod = this.findBudgetPeriodByMonth(month);
+    const lastBudgetPeriod = this.findBudgetPeriodByMonth(
+      endDate.format("YYYY-MM")
+    );
+    let sameBudgetPeriod = firstBudgetPeriod == lastBudgetPeriod;
+    if (sameBudgetPeriod) {
+      return this.getAmountInPeriod(period, firstBudgetPeriod);
     } else {
-      let lastDateOfFirstMonth = startDate.clone().add(1, "month").date(0)
-      let firstDateOfLastMonth = endDate.clone().date(1)
-      let firstAmount = this.getAmountInPeriod(new Period(startDate, lastDateOfFirstMonth), selectedBudget)
-      let lastAmount = this.getAmountInPeriod(new Period(firstDateOfLastMonth, endDate), selectedBudget2)
-      return firstAmount + lastAmount
+      let lastDateOfFirstMonth = startDate
+        .clone()
+        .add(1, "month")
+        .date(0);
+      let firstDateOfLastMonth = endDate.clone().date(1);
+      let firstAmount = this.getAmountInPeriod(
+        new Period(startDate, lastDateOfFirstMonth),
+        firstBudgetPeriod
+      );
+      let lastAmount = this.getAmountInPeriod(
+        new Period(firstDateOfLastMonth, endDate),
+        lastBudgetPeriod
+      );
+      return firstAmount + lastAmount;
     }
   };
 
@@ -92,20 +101,19 @@ export class Budgets {
 
   getAmountInPeriod(period, selectedBudget) {
     let days = period.getDays();
-    if(!selectedBudget) {
-      return 0
+    if (!selectedBudget) {
+      return 0;
     }
     let amountOfThisPeriod = selectedBudget.amount;
     let daysInPeriod = period.startDate.daysInMonth();
     return (amountOfThisPeriod / daysInPeriod) * days;
   }
-
 }
 
 class Period {
   constructor(startDate, endDate) {
-    this.startDate = startDate
-    this.endDate = endDate
+    this.startDate = startDate;
+    this.endDate = endDate;
   }
 
   getDays() {

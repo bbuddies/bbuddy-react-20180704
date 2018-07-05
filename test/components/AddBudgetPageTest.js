@@ -86,11 +86,18 @@ describe("Budgets", () => {
         expect(total).to.eq(3100);
       });
 
-      it("2 month", () => {
+      it("2 full months", () => {
         const startDate = moment("2018-06-01");
         const endDate = moment("2018-07-31");
         const total = budgets.query(startDate, endDate);
         expect(total).to.eq(4600);
+      });
+
+      it("2 half months", () => {
+        const startDate = moment("2018-06-16");
+        const endDate = moment("2018-07-16");
+        const total = budgets.query(startDate, endDate);
+        expect(total).to.eq(50*15 + 100*16);
       });
     });
   });
