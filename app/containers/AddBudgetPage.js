@@ -51,13 +51,8 @@ class AddBudgetPageContainer extends React.Component {
   }
 
   addBudget = () => {
-    let budget = {
-      amount: this.state.amount,
-      month: this.state.month
-    }
-
     this.setState({
-      budgets: [...this.state.budgets, budget]
+      budgets: add(this.state.month, this.state.amount, this.state.budgets)
     })
   }
 
@@ -69,8 +64,14 @@ class AddBudgetPageContainer extends React.Component {
 }
 
 export class Budget {
-  amount = ''
-  month = ''
+  constructor(month = '', amount = 0) {
+    this.amount = amount
+    this.month = month
+  }
 }
 
 export default AddBudgetPageContainer
+export function add(month, amount, budgets) {
+  let budget = new Budget(month, amount)
+  return [...budgets, budget]
+}
