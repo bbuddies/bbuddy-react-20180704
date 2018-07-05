@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import callApi from '../api'
 import history from '../history'
+import config from '../config'
 
 class AddBudget extends React.Component {
   state = {
@@ -33,7 +34,7 @@ class AddBudget extends React.Component {
       amount: parseInt(this.state.budget.amount)
     }
     if (this.isValid()) {
-      callApi('budgets', 'POST', this.state.budget).then(response => {
+      callApi(`${config.apiUrl}budgets`, 'POST', this.state.budget).then(response => {
         history.push('/budgets')
       })
     }
@@ -70,6 +71,7 @@ class AddBudget extends React.Component {
         <CardHeader title='Add Budget'/>
         <CardContent>
           <TextField label="Month"
+            id='Month'
             autoFocus
             fullWidth={true}
             value={this.state.budget.month}
@@ -78,6 +80,7 @@ class AddBudget extends React.Component {
             onChange={this.handleChange('month')}
           />
           <TextField label="Amount"
+            id='Amount'
             type="number"
             fullWidth={true}
             value={this.state.budget.amount}

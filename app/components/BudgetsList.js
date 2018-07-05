@@ -41,7 +41,7 @@ class BudgetsPage extends React.Component {
       <Card>
         <CardHeader title='Budgets'/>
         <CardContent>
-          <Table>
+          <Table id='budget-table'>
             <TableHead>
               <TableRow>
                 <TableCell>Month</TableCell>
