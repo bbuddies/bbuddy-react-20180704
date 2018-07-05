@@ -15,73 +15,84 @@ import run from 'gulp-run'
 
 const dev = !process.argv.includes('--production')
 
-gulp.task("default", ["server", "mocha"], () => {
-  gulp.watch(["app/**/*", "sass/**/*"], ["build"]);
-  gulp.watch(["app/**/*", "test/**/*.js"], ["mocha"]);
-});
-
-gulp.task("mocha", () => {
-  return gulp.src(['test/**/*.js'], {read: false})
-    .pipe(mocha())
-    .on('error', gutil.log)
-    .on('error', notify.onError("Error: <%= error.message %>"));
+gulp.task('default', ['server', 'mocha'], () => {
+  gulp.watch(['app/**/*', 'sass/**/*'], ['build'])
+  gulp.watch(['app/**/*', 'test/**/*.js'], ['mocha'])
 })
 
-gulp.task("coverage", ["clean:coverage"], () => {
+gulp.task('mocha:watch', () => {
+  gulp.watch(['app/**/*', 'test/**/*.js'], ['mocha'])
+})
+
+gulp.task('mocha', () => {
+  return gulp
+    .src(['test/**/*.js'], { read: false })
+    .pipe(mocha())
+    .on('error', gutil.log)
+    .on('error', notify.onError('Error: <%= error.message %>'))
+})
+
+gulp.task('coverage', ['clean:coverage'], () => {
   return run('nyc mocha').exec()
 })
 
-gulp.task("build", ["clean:build"], callback => {
+gulp.task('build', ['clean:build'], callback => {
   const analyze = process.argv.includes('--analyze')
-  let config = webpackConfig(dev);
-  if (analyze){
-    const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  let config = webpackConfig(dev)
+  if (analyze) {
+    const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
     config.plugins.push(new BundleAnalyzerPlugin())
   }
   webpack(config, (err, stats) => {
-    if (err) throw new gutil.PluginError("build", err)
-    gutil.log("[build]", stats.toString({
-      chunks: false,
-      colors: true
-    }))
+    if (err) throw new gutil.PluginError('build', err)
+    gutil.log(
+      '[build]',
+      stats.toString({
+        chunks: false,
+        colors: true
+      })
+    )
     callback()
-  });
-});
-
-gulp.task("clean", ["clean:build", "clean:coverage"])
-
-gulp.task("clean:build", () => {
-  return gulp.src(['dist'], {read: false})
-    .pipe(clean())
+  })
 })
 
-gulp.task("clean:coverage", () => {
-  return gulp.src(['coverage'], {read: false})
-    .pipe(clean())
+gulp.task('clean', ['clean:build', 'clean:coverage'])
+
+gulp.task('clean:build', () => {
+  return gulp.src(['dist'], { read: false }).pipe(clean())
 })
 
-gulp.task("server", () => {
+gulp.task('clean:coverage', () => {
+  return gulp.src(['coverage'], { read: false }).pipe(clean())
+})
+
+gulp.task('server', () => {
   let port = dev ? 8100 : 9100
-  new WebpackDevServer(webpack(webpackConfig(dev)))
-    .listen(port, "localhost", err => {
-      if (err) throw new gutil.PluginError("webpack-dev-server", err)
-      gutil.log("[webpack-dev-server]", `http://localhost:${port}/`)
-    })
-});
+  new WebpackDevServer(webpack(webpackConfig(dev))).listen(port, 'localhost', err => {
+    if (err) throw new gutil.PluginError('webpack-dev-server', err)
+    gutil.log('[webpack-dev-server]', `http://localhost:${port}/`)
+  })
+})
 
 gulp.task('actions', () => {
   let argv = minimist(process.argv.slice(2))
-  let {entity} = argv
+  let { entity } = argv
   let entities = pluralize(entity)
-  gulp.src('templates/apiActions.js')
-    .pipe(template({
-      entity,
-      entities,
-      ENTITY: entity.toUpperCase(),
-      ENTITIES: entities.toUpperCase(),
-      Entity: _.startCase(entity),
-      Entities: _.startCase(entities)
-    }, {interpolate: /<%=([\s\S]+?)%>/g}))
+  gulp
+    .src('templates/apiActions.js')
+    .pipe(
+      template(
+        {
+          entity,
+          entities,
+          ENTITY: entity.toUpperCase(),
+          ENTITIES: entities.toUpperCase(),
+          Entity: _.startCase(entity),
+          Entities: _.startCase(entities)
+        },
+        { interpolate: /<%=([\s\S]+?)%>/g }
+      )
+    )
     .pipe(rename(entity + '.generated.js'))
     .pipe(gulp.dest('app/actions/'))
 })
