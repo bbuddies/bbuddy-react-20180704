@@ -6,6 +6,7 @@ import Page from './containers/Page'
 import DashboardPage from './containers/DashboardPage'
 import AccountsPage from './containers/AccountsPage'
 import AddAccountPage from './containers/AddAccountPage'
+import AddBudgerPage from './containers/AddBudgetPage'
 
 const layout = Component => () => (
   <Page>
@@ -22,6 +23,7 @@ export default () => {
       <Route exact path="/" component={layout(DashboardPage)}/>
       <Route exact path="/accounts" component={layout(AccountsPage)}/>
       <Route exact path="/accounts/add" component={layout(AddAccountPage)}/>
+      <Route exact path="/budgets/add" component={AddBudgerPage}/>
     </Switch>
   )
 }
