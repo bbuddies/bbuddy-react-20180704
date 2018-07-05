@@ -8,9 +8,9 @@ import TextField from '@material-ui/core/TextField'
 
 const AddBudgetPage = props => (
   <Card>
-    <CardHeader title="Add Budget" />
+    <CardHeader title="Add Budget"/>
     <CardContent>
-      <TextField fullWidth={true} id="month" label="Month" onChange={props.handleChange('month')} />
+      <TextField fullWidth={true} id="month" label="Month" onChange={props.handleChange('month')}/>
       <TextField
         fullWidth={true}
         id="amount"
@@ -24,9 +24,9 @@ const AddBudgetPage = props => (
       </Button>
     </CardActions>
 
-    {props.budgets.map(budget => {
+    {props.budgets.map((budget, index) => {
       return (
-        <React.Fragment>
+        <React.Fragment key={index}>
           <p>{budget.month}</p>
           <p>{budget.amount}</p>
         </React.Fragment>
@@ -35,31 +35,58 @@ const AddBudgetPage = props => (
   </Card>
 )
 
-class AddBudgetPageContainer extends React.Component {
-  state = {
-    budgets: [new Budget()]
-  }
-
-  render() {
-    return (
-      <AddBudgetPage
-        handleChange={this.handleChange}
-        addBudget={this.addBudget}
-        budgets={this.state.budgets}
-      />
-    )
+class Budgets {
+  constructor(setState) {
+    this.setState = setState
+    this.budgets = []
+    this.budget = {month: '', amount: 0}
   }
 
   addBudget = () => {
-    this.setState({
-      budgets: add(this.state.month, this.state.amount, this.state.budgets)
-    })
+    this.budgets.push(this.budget)
+    this.setState({})
+    // this.setState({ budgets: this.budgets })
   }
-
   handleChange = name => {
     return e => {
-      this.setState({ [name]: e.target.value })
+      this.budget[name] = e.target.value
+      this.setState({budget: this.budget})
     }
+  }
+}
+
+class AddBudgetPageContainer extends React.Component {
+  budgets = new Budgets(state => this.setState(state))
+
+  render() {
+    return (
+      <Card>
+        <CardHeader title="Add Budget"/>
+        <CardContent>
+          <TextField fullWidth={true} id="month" label="Month" onChange={e => this.budgets.handleChange('month')(e)}/>
+          <TextField
+            fullWidth={true}
+            id="amount"
+            label="Amount"
+            onChange={(e) => this.budgets.handleChange('amount')(e)}
+          />
+        </CardContent>
+        <CardActions>
+          <Button variant="contained" color="primary" onClick={() => this.budgets.addBudget()}>
+            Save
+          </Button>
+        </CardActions>
+
+        {this.budgets.budgets.map((budget, index) => {
+          return (
+            <React.Fragment key={index}>
+              <p>{budget.month}</p>
+              <p>{budget.amount}</p>
+            </React.Fragment>
+          )
+        })}
+      </Card>
+    )
   }
 }
 
@@ -71,7 +98,8 @@ export class Budget {
 }
 
 export default AddBudgetPageContainer
-export function add(month, amount, budgets) {
+
+export function add({month, amount}, budgets) {
   let budget = new Budget(month, amount)
   return [...budgets, budget]
 }

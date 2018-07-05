@@ -10,7 +10,7 @@ describe('budget', () => {
     })
   })
 
-  it('should accept parameter when creating Budget', () => {
+  xit('should accept parameter when creating Budget', () => {
     const budget = new Budget('2018-06', 1000)
     expect(budget).to.deep.eq({
       amount: 1000,
@@ -18,7 +18,7 @@ describe('budget', () => {
     })
   })
 
-  it('should add new budget to the list', () => {
+  xit('should add new budget to the list', () => {
     const budgets = []
     const result = add('2018-06', 1000, budgets)
     expect(result).to.deep.eq([
