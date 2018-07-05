@@ -10,25 +10,62 @@ import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 
-const BudgetsPage = () => (
-  <Card>
-    <CardHeader title='Budgets'/>
-    <CardContent>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Month</TableCell>
-            <TableCell numeric>Amount</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-        </TableBody>
-      </Table>
-    </CardContent>
-    <CardActions>
-      <Button variant="contained" color="primary">Add</Button>
-    </CardActions>
-  </Card>
-)
+import callApi from '../../app/api'
+import config from '../config'
+import history from '../history'
+
+
+class BudgetsPage extends React.Component {
+  state = {
+    budgets: [],
+  }
+
+  goToAddBudget() {
+    history.push('/budgets/add')
+  }
+
+  componentDidMount() {
+    callApi(`${config.apiUrl}budgets`, 'GET').then(
+      data => {
+        this.setState({ budgets: data })
+      }
+    ).catch(
+      ({status, data}) => {
+        console.log(data)
+      }
+    )
+  }
+
+  render() {
+    return (
+      <Card>
+        <CardHeader title='Budgets'/>
+        <CardContent>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Month</TableCell>
+                <TableCell numeric>Amount</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                this.state.budgets.map((budget, index) => (
+                  <TableRow key={index}>
+                    <TableCell component='th' scope='row'>{budget.month}</TableCell>
+                    <TableCell numeric>{budget.amount}</TableCell>
+                  </TableRow>
+                ))
+              }
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardActions>
+          <Button variant="contained" color="primary" onClick={this.goToAddBudget}>Add</Button>
+        </CardActions>
+      </Card>
+    )
+  }
+}
 
 export default BudgetsPage
