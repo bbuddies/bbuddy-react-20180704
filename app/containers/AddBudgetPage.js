@@ -8,7 +8,6 @@ import TextField from '@material-ui/core/TextField';
 import callApi from '../api'
 
 class AddBudgetPage extends React.Component {
-
     state = {
         month: "",
         amount: 0,
@@ -74,7 +73,7 @@ class AddBudgetPage extends React.Component {
         return 
       }
 
-      callApi("http://localhost:8080/budget", "POST", formData, "" ).then(
+      callApi("budget", "POST", formData, "" ).then(
         (r) => {
           console.log(r)
         }, (e) => {
