@@ -34,7 +34,7 @@ class AddBudget extends React.Component {
     }
     if (this.isValid()) {
       callApi('budgets', 'POST', this.state.budget).then(response => {
-        history.goBack()
+        history.push('/budgets')
       })
     }
   }
