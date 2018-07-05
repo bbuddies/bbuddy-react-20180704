@@ -54,12 +54,17 @@ describe("Budgets", () => {
         const total = budgets.query(startDate, endDate);
         expect(total).to.eq(3100);
       });
-
       it("10 days", () => {
         const startDate = moment("2018-07-01");
         const endDate = moment("2018-07-10");
         const total = budgets.query(startDate, endDate);
         expect(total).to.eq(1000);
+      });
+      xit("full year", () => {
+        const startDate = moment("2018-01-01");
+        const endDate = moment("2018-12-31");
+        const total = budgets.query(startDate, endDate);
+        expect(total).to.eq(3100);
       });
     });
     context("there are 2 budgets", () => {
@@ -67,11 +72,25 @@ describe("Budgets", () => {
         addBudget("2018-06", 1500);
         addBudget("2018-07", 3100);
       });
-      it("full month", () => {
+      it("month 6", () => {
+        const startDate = moment("2018-06-01");
+        const endDate = moment("2018-06-30");
+        const total = budgets.query(startDate, endDate);
+        expect(total).to.eq(1500);
+      });
+
+      it("month 7", () => {
         const startDate = moment("2018-07-01");
         const endDate = moment("2018-07-31");
         const total = budgets.query(startDate, endDate);
         expect(total).to.eq(3100);
+      });
+
+      it("2 month", () => {
+        const startDate = moment("2018-06-01");
+        const endDate = moment("2018-07-31");
+        const total = budgets.query(startDate, endDate);
+        expect(total).to.eq(4600);
       });
     });
   });

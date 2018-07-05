@@ -52,7 +52,7 @@ export class Budgets {
   }
 
   addBudget = () => {
-    this.budgets.push({...this.budget});
+    this.budgets.push({ ...this.budget });
     this.setState({});
   };
   handleChange = name => {
@@ -66,21 +66,51 @@ export class Budgets {
   };
 
   query = (startDate, endDate) => {
-    const month = startDate.format('YYYY-MM')
-    const selectedBudget = this.budgets.filter((value) => {
-      return value.month == month
-    }, this.budgets)[0]
-    
-    console.log(selectedBudget)    
+    const period = new Period(startDate, endDate)
+    const month = startDate.format("YYYY-MM");
+    const selectedBudget = this.findBudgetPeriodByMonth(month);
+    const selectedBudget2 = this.findBudgetPeriodByMonth(endDate.format("YYYY-MM"));
 
-    if (selectedBudget) {
-      let days = endDate.diff(startDate, "days") + 1
-      let amountOfThisPeriod = selectedBudget.amount
-      let daysInPeriod = 31
-      return amountOfThisPeriod/daysInPeriod*days;
+    if(!selectedBudget) {
+      return 0
+    } else if (selectedBudget == selectedBudget2) {
+      return this.getAmountInPeriod(period, selectedBudget);
+    } else {
+      let lastDateOfFirstMonth = startDate.clone().add(1, "month").date(0)
+      let firstDateOfLastMonth = endDate.clone().date(1)
+      let firstAmount = this.getAmountInPeriod(new Period(startDate, lastDateOfFirstMonth), selectedBudget)
+      let lastAmount = this.getAmountInPeriod(new Period(firstDateOfLastMonth, endDate), selectedBudget2)
+      return firstAmount + lastAmount
     }
-    return 0;
   };
+
+  findBudgetPeriodByMonth(month) {
+    return this.budgets.filter(value => {
+      return value.month == month;
+    }, this.budgets)[0];
+  }
+
+  getAmountInPeriod(period, selectedBudget) {
+    let days = period.getDays();
+    if(!selectedBudget) {
+      return 0
+    }
+    let amountOfThisPeriod = selectedBudget.amount;
+    let daysInPeriod = period.startDate.daysInMonth();
+    return (amountOfThisPeriod / daysInPeriod) * days;
+  }
+
+}
+
+class Period {
+  constructor(startDate, endDate) {
+    this.startDate = startDate
+    this.endDate = endDate
+  }
+
+  getDays() {
+    return this.endDate.diff(this.startDate, "days") + 1;
+  }
 }
 
 class AddBudgetPageContainer extends React.Component {
