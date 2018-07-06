@@ -26,7 +26,7 @@ export class BudgetPlan {
     return this.queryInPeriod(new Period(start, end))
   }
 
-  queryInPeriod(period){
+  queryInPeriod(period) {
     if (period.start.isSame(period.end, 'month')) {
       const diffDays = period.end.diff(period.start, 'days') + 1
       return ((this.budgets[this.budgetKey(period.start)] || 0) / period.start.daysInMonth()) * diffDays
@@ -34,18 +34,18 @@ export class BudgetPlan {
       let total = 0
 
       // start month
-      let firstBudget = new Budget(period.start, this.getAmountOfBudgetIncluding(period.start))
+      let firstBudget = this.getBudget(period.start)
       total += this.getAmountBetween(firstBudget.end, period.start)
 
       // months in between
       const monthDiff = period.end.diff(period.start, 'months') - 1
       for (let month = 1; month <= monthDiff; month++) {
-        let budget = new Budget(moment(period.start).add(month, 'month'), this.getAmountOfBudgetIncluding(moment(period.start).add(month, 'month')))
+        let budget = this.getBudget(moment(period.start).add(month, 'month'))
         total += budget.amount
       }
 
       // end month
-      let lastBudget = new Budget(period.end, this.getAmountOfBudgetIncluding(period.end))
+      let lastBudget = this.getBudget(period.end)
       total += this.getAmountBetween(period.end, lastBudget.start)
 
       return total
@@ -61,7 +61,7 @@ export class BudgetPlan {
   }
 
   getBudget(date) {
-
+    return new Budget(date, this.getAmountOfBudgetIncluding(date))
   }
 
   getAmountOfBudgetIncluding(date) {
