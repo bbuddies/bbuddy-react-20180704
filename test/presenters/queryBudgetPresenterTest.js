@@ -68,18 +68,3 @@ describe('Budget', () => {
   })
 })
 
-describe('getNumbersOfDaysInStartMonth', () => {
-  describe('when month is 2018-07-01', () => {
-    it('should return 31', () => {
-      expect(getNumbersOfDaysInStartMonth('2018-07-01')).to.eq(31)
-    })
-  })
-})
-
-describe('getNumbersOfDaysInEndMonth', () => {
-  describe('when date is 2018-07-15', () => {
-    it('should return 15', () => {
-      expect(getNumbersOfDaysInEndMonth('2018-07-15')).to.eq(15)
-    })
-  })
-})
