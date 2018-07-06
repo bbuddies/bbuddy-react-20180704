@@ -9,12 +9,19 @@ class Period {
   days() {
     return this.end.diff(this.start, 'days') + 1;
   }
+
+  getOverlappingDays(another) {
+    let startOfOverlapping = this.start.isAfter(another.start) ? this.start : another.start;
+    let endOfOverlapping = this.end.isBefore(another.end) ? this.end : another.end;
+    return new Period(startOfOverlapping, endOfOverlapping).days();
+  }
 }
 
 class Budget {
   constructor(date, amount) {
     this.start = moment(date).startOf('month')
     this.end = moment(date).endOf('month')
+    this.period = new Period(this.start, this.end)
     this.amount = amount
   }
 
@@ -42,21 +49,25 @@ export class BudgetPlan {
 
       // start month
       let firstBudget = this.getBudget(period.start)
-      total += this.getAmountWithin(new Period(period.start, firstBudget.end), firstBudget)
+      total += this.getAmountOfOverlapping(period, firstBudget)
 
       // months in between
       const monthDiff = period.end.diff(period.start, 'months') - 1
       for (let month = 1; month <= monthDiff; month++) {
         let budget = this.getBudget(moment(period.start).add(month, 'month'))
-        total += budget.amount
+        total += this.getAmountOfOverlapping(period, budget)
       }
 
       // end month
       let lastBudget = this.getBudget(period.end)
-      total += this.getAmountWithin(new Period(lastBudget.start, period.end), lastBudget)
+      total += this.getAmountOfOverlapping(period, lastBudget)
 
       return total
     }
+  }
+
+  getAmountOfOverlapping(period, budget) {
+    return period.getOverlappingDays(budget.period) * budget.amount / budget.days();
   }
 
   getAmountWithin(period, budget) {
