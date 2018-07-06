@@ -8,7 +8,16 @@ class Period {
 
 }
 
-export class Budget {
+class Budget {
+  constructor(date, amount) {
+    this.start = moment(date).startOf('month')
+    this.end = moment(date).endOf('month')
+    this.amount = amount
+  }
+
+}
+
+export class BudgetPlan {
   budgets = {}
 
   query(startDate, endDate) {
@@ -22,25 +31,24 @@ export class Budget {
       const diffDays = period.end.diff(period.start, 'days') + 1
       return ((this.budgets[this.budgetKey(period.start)] || 0) / period.start.daysInMonth()) * diffDays
     } else {
-      let budget = 0
+      let total = 0
 
       // start month
-      let endOfFirstBudget = moment(period.start).endOf('month');
-      budget += this.getAmountBetween(endOfFirstBudget, period.start)
+      let firstBudget = new Budget(period.start, this.getAmountOfBudgetIncluding(period.start))
+      total += this.getAmountBetween(firstBudget.end, period.start)
 
       // months in between
       const monthDiff = period.end.diff(period.start, 'months') - 1
       for (let month = 1; month <= monthDiff; month++) {
-        const monthString = this.budgetKey(moment(period.start).add(month, 'month'))
-        const budgetThisMonth = this.budgets[monthString] || 0
-        budget += budgetThisMonth
+        let budget = new Budget(moment(period.start).add(month, 'month'), this.getAmountOfBudgetIncluding(moment(period.start).add(month, 'month')))
+        total += budget.amount
       }
 
       // end month
-      let startOfLastBudget = moment(period.end).startOf('month');
-      budget += this.getAmountBetween(period.end, startOfLastBudget)
+      let lastBudget = new Budget(period.end, this.getAmountOfBudgetIncluding(period.end))
+      total += this.getAmountBetween(period.end, lastBudget.start)
 
-      return budget
+      return total
     }
   }
 
@@ -52,8 +60,12 @@ export class Budget {
     return totalBudgetLastMonth;
   }
 
-  getAmountOfBudgetIncluding(momentStartDate) {
-    return this.budgets[this.budgetKey(momentStartDate)] || 0;
+  getBudget(date) {
+
+  }
+
+  getAmountOfBudgetIncluding(date) {
+    return this.budgets[this.budgetKey(date)] || 0;
   }
 
   budgetKey(momentStartDate) {

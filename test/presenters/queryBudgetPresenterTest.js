@@ -1,14 +1,14 @@
 import {expect} from 'chai'
 import {
-  Budget,
+  BudgetPlan,
   getNumbersOfDaysInStartMonth,
   getNumbersOfDaysInEndMonth
 } from '../../app/presenters/queryBudgetPresenter'
 
-describe('Budget', () => {
+describe('BudgetPlan', () => {
   let budget
   beforeEach(() => {
-    budget = new Budget()
+    budget = new BudgetPlan()
   })
   describe('query', () => {
     context('no budget', () => {
