@@ -20,7 +20,7 @@ export class Budget {
     const momentStartDate = moment(startDate, 'YYYY-MM-DD')
     const momentEndDate = moment(endDate, 'YYYY-MM-DD')
 
-    const budgetFirstMonth = this.getBudgetFirstMonth(startDate, startMonth)
+    const budgetFirstMonth = this.getBudgetStartMonth(startDate, startMonth)
     const budgetMonthsInBetween = this.getBudgetMonthsInBetween(
       momentEndDate,
       momentStartDate,
@@ -34,25 +34,29 @@ export class Budget {
     let budget = 0
     const monthDiff = momentEndDate.diff(momentStartDate, 'months') - 1
     for (let month = 1; month <= monthDiff; month++) {
-      const monthString = moment(startDate, 'YYYY-MM-DD')
+      const currentMonth = moment(startDate, 'YYYY-MM-DD')
         .add(month, 'month')
         .format('YYYY-MM')
-      const budgetThisMonth = this.budgets[monthString] || 0
+      const budgetThisMonth = this.getBudgetForMonth(currentMonth)
       budget += budgetThisMonth
     }
     return budget
   }
 
+  getBudgetForMonth(currentMonth) {
+    return this.budgets[currentMonth] || 0
+  }
+
   getBudgetLastMonth(endDate, endMonth) {
     const numberOfDaysInLastMonth = getNumbersOfDaysInEndMonth(endDate)
-    const lastMonthBudget = this.budgets[endMonth] || 0
+    const lastMonthBudget = this.getBudgetForMonth(endMonth)
     const totalBudgetLastMonth = calculateBudget(numberOfDaysInLastMonth, endMonth, lastMonthBudget)
     return totalBudgetLastMonth
   }
 
-  getBudgetFirstMonth(startDate, startMonth) {
+  getBudgetStartMonth(startDate, startMonth) {
     const numberOfDaysInStartMonth = getNumbersOfDaysInStartMonth(startDate)
-    const firstMonthBudget = this.budgets[startMonth] || 0
+    const firstMonthBudget = this.getBudgetForMonth(startMonth)
     const totalBudgetFirstMonth = calculateBudget(
       numberOfDaysInStartMonth,
       startMonth,
@@ -72,7 +76,7 @@ export class Budget {
 
   calBudgetSameMonth(momentEndDate, momentStartDate, startMonth) {
     const diffDays = momentEndDate.diff(momentStartDate, 'days') + 1
-    const budgetFirstMonth = this.budgets[startMonth] || 0
+    const budgetFirstMonth = this.getBudgetForMonth(startMonth)
     const budget = calculateBudget(diffDays, startMonth, budgetFirstMonth)
     return budget
   }
