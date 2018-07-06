@@ -1,31 +1,45 @@
 import moment from 'moment'
 
+class Period {
+  constructor(start, end) {
+    this.start = start
+    this.end = end
+  }
+
+}
+
 export class Budget {
   budgets = {}
 
   query(startDate, endDate) {
     const start = moment(startDate, 'YYYY-MM-DD')
     const end = moment(endDate, 'YYYY-MM-DD')
+    return this.queryInPeriod(new Period(start, end))
+  }
 
-    if (start.isSame(end, 'month')) {
-      const diffDays = end.diff(start, 'days') + 1
-      return ((this.budgets[this.budgetKey(start)] || 0) / start.daysInMonth()) * diffDays
+  queryInPeriod(period){
+    if (period.start.isSame(period.end, 'month')) {
+      const diffDays = period.end.diff(period.start, 'days') + 1
+      return ((this.budgets[this.budgetKey(period.start)] || 0) / period.start.daysInMonth()) * diffDays
     } else {
       let budget = 0
 
       // start month
-      budget += this.getAmountBetween(moment(start).endOf('month'), start)
+      let endOfFirstBudget = moment(period.start).endOf('month');
+      budget += this.getAmountBetween(endOfFirstBudget, period.start)
 
       // months in between
-      const monthDiff = end.diff(start, 'months') - 1
+      const monthDiff = period.end.diff(period.start, 'months') - 1
       for (let month = 1; month <= monthDiff; month++) {
-        const monthString = this.budgetKey(moment(start).add(month, 'month'))
+        const monthString = this.budgetKey(moment(period.start).add(month, 'month'))
         const budgetThisMonth = this.budgets[monthString] || 0
         budget += budgetThisMonth
       }
 
       // end month
-      budget += this.getAmountBetween(end, moment(end).startOf('month'))
+      let startOfLastBudget = moment(period.end).startOf('month');
+      budget += this.getAmountBetween(period.end, startOfLastBudget)
+
       return budget
     }
   }
