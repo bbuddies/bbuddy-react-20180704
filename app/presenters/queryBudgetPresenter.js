@@ -1,4 +1,5 @@
 import moment from 'moment'
+import _ from 'lodash'
 
 class Period {
   constructor(start, end) {
@@ -7,7 +8,7 @@ class Period {
   }
 
   days() {
-    return this.end.diff(this.start, 'days') + 1;
+    return this.start.isAfter(this.end) ? 0 : this.end.diff(this.start, 'days') + 1;
   }
 
   getOverlappingDays(another) {
@@ -24,9 +25,8 @@ class Budget {
     this.period = new Period(this.start, this.end)
     this.amount = amount
   }
-
-  days() {
-    return this.start.daysInMonth()
+  getAmountOfOverlapping(period) {
+    return period.getOverlappingDays(this.period) * this.amount / this.period.days();
   }
 }
 
@@ -40,53 +40,9 @@ export class BudgetPlan {
   }
 
   queryInPeriod(period) {
-    if (period.start.isSame(period.end, 'month')) {
-      const diffDays = period.end.diff(period.start, 'days') + 1
-      let budget = this.getBudget(period.start)
-      return budget.amount / period.start.daysInMonth() * diffDays
-    } else {
-      let total = 0
-
-
-      // months in between
-      const monthDiff = period.end.diff(period.start, 'months') + 1
-      for (let month = 0; month <= monthDiff; month++) {
-        let budget = this.getBudget(moment(period.start).add(month, 'month'))
-        total += this.getAmountOfOverlapping(period, budget)
-      }
-
-
-      return total
-    }
+    return _(this.budgets)
+      .map((amount, month) => new Budget(moment(month, 'YYYY-MM'), amount))
+      .sumBy(budget => budget.getAmountOfOverlapping(period))
   }
 
-  getAmountOfOverlapping(period, budget) {
-    return period.getOverlappingDays(budget.period) * budget.amount / budget.days();
-  }
-
-  getAmountWithin(period, budget) {
-    return period.days() * budget.amount / budget.days();
-  }
-
-  getBudget(date) {
-    return new Budget(date, this.getAmountOfBudgetIncluding(date))
-  }
-
-  getAmountOfBudgetIncluding(date) {
-    return this.budgets[this.budgetKey(date)] || 0;
-  }
-
-  budgetKey(momentStartDate) {
-    return momentStartDate.format('YYYY-MM');
-  }
-}
-
-const getMonth = date => date.substr(0, date.lastIndexOf('-'))
-
-export const getNumbersOfDaysInStartMonth = date => {
-  return moment(date).endOf('month').diff(date, 'days') + 1
-}
-
-export const getNumbersOfDaysInEndMonth = date => {
-  return date.diff(moment(date).startOf('month'), 'days') + 1
 }
