@@ -47,20 +47,14 @@ export class BudgetPlan {
     } else {
       let total = 0
 
-      // start month
-      let firstBudget = this.getBudget(period.start)
-      total += this.getAmountOfOverlapping(period, firstBudget)
 
       // months in between
-      const monthDiff = period.end.diff(period.start, 'months') - 1
-      for (let month = 1; month <= monthDiff; month++) {
+      const monthDiff = period.end.diff(period.start, 'months') + 1
+      for (let month = 0; month <= monthDiff; month++) {
         let budget = this.getBudget(moment(period.start).add(month, 'month'))
         total += this.getAmountOfOverlapping(period, budget)
       }
 
-      // end month
-      let lastBudget = this.getBudget(period.end)
-      total += this.getAmountOfOverlapping(period, lastBudget)
 
       return total
     }
