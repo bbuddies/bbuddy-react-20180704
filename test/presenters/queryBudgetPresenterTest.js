@@ -68,6 +68,14 @@ describe('Budget', () => {
           expect(result).to.eq(6200)
         })
       })
+
+      describe('when query from 2018-07-15 to 2018-08-15', () => {
+        it('should return 3200', () => {
+          const result = budget.query('2018-07-15', '2018-08-15')
+
+          expect(result).to.eq(3200)
+        })
+      })
     })
 
     describe('given there is budget for 2017-12: 3100, 2019-01: 3100', () => {
